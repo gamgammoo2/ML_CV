@@ -14,7 +14,7 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
     max_num_hands=max_num_hands,
-    min_detection_confidence=0.5,
+    min_detection_confidence=0.5, #0.5로 해두는게 제일 좋다.
     min_tracking_confidence=0.5)
 
 # Gesture recognition model
@@ -24,24 +24,24 @@ label = file[:, -1].astype(np.float32)
 knn = cv2.ml.KNearest_create()#opencv에 knn을 사용해서 학습을 시킴
 knn.train(angle, cv2.ml.ROW_SAMPLE, label)
 
-cap = cv2.VideoCapture(0) #opencv의 videocapture을 사용해서 이미지를 읽어온다.
+cap = cv2.VideoCapture(0) #opencv의 videocapture을 사용해서 이미지를 읽어온다. 웹캠을 열어줌. 웹캠이 여러개 일 수 있으니까 0,1,2 인지 잘 확인 후 조정.
 
-while cap.isOpened():
-    ret, img = cap.read() #한 프레임씩 이미지를 읽어옴.
-    if not ret:
+while cap.isOpened(): #카메라가 열여있으면
+    ret, img = cap.read() #한 프레임씩 이미지를 읽어옴. ret은 '성공했다'라는 상태
+    if not ret: #성공하지 못한 상태면 계속 하는 것.
         continue
 
-    img = cv2.flip(img, 1)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.flip(img, 1) #opencv로 받아온 한 프레임을 이미지 좌우 반전 시켜줌
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # oepncv는 색상이 BGR 기반인데, mdiapipe는 RGB 기반임. 그래서 전환시켜주는 것
 
-    result = hands.process(img)
+    result = hands.process(img) # hands.process() 하면 전처리 및 모델 추론을 함께 실행해줌.
 
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #이미지를 다시 출력해야하므로 RGB를 BGR로 전환 
 
-    if result.multi_hand_landmarks is not None: #손을 인식했다면
+    if result.multi_hand_landmarks is not None: #손을 인식했다면(인식하면 result.multi_hand_landmarks 는 true가 될 거임)
         for res in result.multi_hand_landmarks: #여러개의 손을 인식했었을 수 있으므로.
             joint = np.zeros((21, 3)) #손의 joint(총 21개)를 xyz좌표 내에 저장.
-            for j, lm in enumerate(res.landmark):
+            for j, lm in enumerate(res.landmark): #랜드마크는 mediapipe의 joint 숫자부분에 해당
                 joint[j] = [lm.x, lm.y, lm.z] #랜드마크의 x,y,z좌표를 joint에 저장
 
             # Compute angles between joints -각 joint를 가지고 각도 계산
