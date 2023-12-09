@@ -52,7 +52,7 @@ while cap.isOpened(): #카메라가 열여있으면
             v = v / np.linalg.norm(v, axis=1)[:, np.newaxis] # np.linalg.norm(v,axis=1) : 각 벡터의 길이 - 길이로 나눠줌으로서 nomalize 함.(단위벡터)
 
             # Get angle using arcos of dot product -정규화 된 벡터들은 내적에 arccos을 하면 사이 각도가 나온다.
-            angle = np.arccos(np.einsum('nt,nt->n', #einsum 연산을 통해 행렬, 벡터의 내적, 외적, 전치, 행렬곱 등을 일관성있게 표현할 수 있다.
+            angle = np.arccos(np.einsum('nt,nt->n', #einsum 연산을 통해 행렬, 벡터의 내적, 외적, 전치, 행렬곱 등을 일관성있게 표현할 수 있다. 'https://haystar.tistory.com/93' 참고
                 v[[0,1,2,4,5,6,8,9,10,12,13,14,16,17,18],:], 
                 v[[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19],:])) # [15,]
 
